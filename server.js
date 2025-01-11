@@ -1,22 +1,32 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
+const dotenv = require('dotenv');
+dotenv.config();
+
+const app = require('./app');
+const mongoose = require('mongoose');
+
+// Import routes
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 const newsRoutes = require('./routes/newsRoutes');
 
-const app = express();
+// Port and MongoDB URI setup
 const PORT = process.env.PORT || 3000;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/newsApp';
 
-app.use(cors());
-app.use(express.json());
+// MongoDB connection
+mongoose
+    .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => {
+        console.log('Connected to MongoDB');
+        // Use routes after successful DB connection
+        app.use('/api/auth', authRoutes);  // Auth routes (register, login, logout)
+        app.use('/api/user', userRoutes);  // User routes (profile, update profile)
+        app.use('/api/news', newsRoutes);  // News routes (top headlines, search, etc.)
+        
+        // Start server
+        app.listen(PORT, () => {
+            console.log(`Server is running on http://localhost:${PORT}`);
+        });
+    })
+    .catch((err) => console.error('Failed to connect to MongoDB:', err));
 
-// Register routes
-app.use('/api/news', newsRoutes);
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    res.status(err.status || 500).json({ error: err.message });
-});
-
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
