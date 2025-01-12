@@ -9,6 +9,7 @@ const createRedisClient = require('./config/redisClient'); // Import Redis clien
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const newsRoutes = require('./routes/newsRoutes');
+const historyRoutes = require('./routes/historyRoutes');  // Import the history routes
 
 // Port and MongoDB URI setup
 const PORT = process.env.PORT || 3000;
@@ -30,6 +31,7 @@ redisClient.connect()
                 app.use('/api/auth', authRoutes);  // Auth routes (register, login, logout)
                 app.use('/api/user', userRoutes);  // User routes (profile, update profile)
                 app.use('/api/news', newsRoutes);  // News routes (top headlines, search, etc.)
+                app.use('/api/history', historyRoutes);  // History routes (view user activity)
                 
                 // Start server after both Redis and MongoDB are connected
                 app.listen(PORT, () => {
