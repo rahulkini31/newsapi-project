@@ -1,18 +1,13 @@
 const express = require('express');
 const { getTopHeadlines, searchNews, getEverything, getSources } = require('../controllers/newsController');
+const addApiKey = require('../middlewares/addApiKey'); // Import the middleware
 
 const router = express.Router();
 
-// Top headlines route
-router.get('/top-headlines', getTopHeadlines);
-
-// Search news route
-router.get('/search', searchNews);
-
-// Everything route - Search through all articles
-router.get('/everything', getEverything);
-
-// Sources route - Get news sources
-router.get('/sources', getSources);
+// Apply the middleware only to news routes that require the API key
+router.get('/top-headlines', addApiKey, getTopHeadlines);
+router.get('/search', addApiKey, searchNews);
+router.get('/everything', addApiKey, getEverything);
+router.get('/sources', addApiKey, getSources);
 
 module.exports = router;
