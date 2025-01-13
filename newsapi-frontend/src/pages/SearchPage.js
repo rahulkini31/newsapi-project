@@ -1,27 +1,26 @@
 import React, { useState } from 'react';
 import apiClient from '../services/api';
 import NewsList from '../components/NewsList';
+import SearchBar from '../components/SearchBar';
 
 const SearchPage = () => {
     const [query, setQuery] = useState('');
     const [articles, setArticles] = useState([]);
 
     const handleSearch = () => {
-        apiClient.get(`/search?query=${query}`)
-            .then(response => setArticles(response.data))
-            .catch(error => console.error(error));
+        const token = localStorage.getItem('token');
+        apiClient
+            .get(`/search?query=${query}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            })
+            .then((response) => setArticles(response.data))
+            .catch((error) => console.error(error));
     };
 
     return (
-        <div>
+        <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
             <h1>Search News</h1>
-            <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search for news"
-            />
-            <button onClick={handleSearch}>Search</button>
+            <SearchBar query={query} setQuery={setQuery} handleSearch={handleSearch} />
             <NewsList articles={articles} />
         </div>
     );
